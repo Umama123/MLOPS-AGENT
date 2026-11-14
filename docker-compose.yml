@@ -1,0 +1,25 @@
+services:
+  airflow-standalone:
+    image: apache/airflow:3.0.0-python3.11
+    container_name: mlops-airflow3
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth,airflow.providers.fab.auth_manager.api.auth.backend.basic_auth
+      - AIRFLOW__API_AUTH__JWT_SECRET=super-secret-mlops-jwt-key-2026
+      - _AIRFLOW_DB_MIGRATE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=airflow
+      - _AIRFLOW_WWW_USER_PASSWORD=airflow
+      - _PIP_ADDITIONAL_REQUIREMENTS=mlflow scikit-learn pandas joblib
+      - MLFLOW_TRACKING_URI=sqlite:////opt/airflow/mlflow.db
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./mlflow.db:/opt/airflow/mlflow.db
+      - ./mlruns:/opt/airflow/mlruns
+    ports:
+      - "8080:8080"
+    command: standalone
+    
